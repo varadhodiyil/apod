@@ -34,10 +34,11 @@ class MyApp extends State<MyAppState> {
 
    static APODResponse nasaResponse = new APODResponse();
   
-  _getData() async{
+  Future<Null>_getData() async{
       nasaResponse = await fetchPost();
      
     _refreshController.add(nasaResponse);
+    return null;
   }
 
    _fetch() {
@@ -91,10 +92,12 @@ class MyApp extends State<MyAppState> {
             return Text(snapshot.error);
           }
           if (snapshot.hasData) {
-              return new ListView(
+              return new Column(
           children: <Widget>[
-            new RefreshIndicator(
-                      onRefresh: _fetch(),
+            Expanded(
+                  child: Scrollbar(
+            child: RefreshIndicator(
+                      onRefresh: _getData,
                 child: ListView(
                   children : <Widget>[        
            new Image.network(
@@ -115,9 +118,11 @@ class MyApp extends State<MyAppState> {
                     color: Colors.grey[500],
                   ),
                 ),
-                reLoad
+               // reLoad
                   ]
                 )  
+            )
+                  )
             )      
           ],
         );
