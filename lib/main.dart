@@ -90,11 +90,13 @@ class MyApp extends State<MyAppState> {
             if (snapshot.hasError) {
             return Text(snapshot.error);
           }
-          else if (snapshot.hasData) {
+          if (snapshot.hasData) {
               return new ListView(
           children: <Widget>[
-            
-                        
+            new RefreshIndicator(
+                      onRefresh: _fetch(),
+                child: ListView(
+                  children : <Widget>[        
            new Image.network(
               snapshot.data.url,
               width: 600.0,
@@ -102,7 +104,7 @@ class MyApp extends State<MyAppState> {
               fit: BoxFit.cover,
             ),
             new Text(
-                    snapshot.data.copyright,
+                    snapshot.data.title,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -114,12 +116,13 @@ class MyApp extends State<MyAppState> {
                   ),
                 ),
                 reLoad
-                    
-                  
+                  ]
+                )  
+            )      
           ],
         );
                 }
-        else  if (snapshot.connectionState != ConnectionState.done) {
+          if (snapshot.connectionState != ConnectionState.done) {
             return Center(
               child: CircularProgressIndicator(),
             );
