@@ -25,79 +25,56 @@ Future<APODResponse> fetchPost() async {
     return APODResponse.fromJson(json.decode(response.body));
   } else {
     // If that call was not successful, throw an error.
-    throw Exception('Failed to load post');
+     throw Exception('Failed to load post');
   }
 }
 
 class MyApp extends State<MyAppState> {
-  _getData() {
-    print("yo");
-    setState(() {
-      // nasaResponse = await fetchPost();
-      fetchPost().then((data) => nasaResponse);
+  StreamController<APODResponse> _refreshController;
 
-      print(nasaResponse.toString());
-    });
+   static APODResponse nasaResponse = new APODResponse();
+  
+  _getData() async{
+      nasaResponse = await fetchPost();
+     
+    _refreshController.add(nasaResponse);
+  }
+
+   _fetch() {
+ 
+    _getData();
+    
   }
 
   @override
   void initState() {
     super.initState();
-    // nasaResponse = await  fetchPost();
-
+    
+    _refreshController = new StreamController<APODResponse>();
+  
     _getData();
   }
 
-  static APODResponse nasaResponse = new APODResponse();
+ 
   @override
   Widget build(BuildContext context) {
-    Widget titleSection = Container(
-      padding: const EdgeInsets.all(32.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    // nasaResponse.,
-                    '',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Text(
-                  'Kandersteg, Switzerland',
-                  style: TextStyle(
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+
+
 
     Widget reLoad = Container(
+      
       child: MaterialButton(
-        child: new Text("Reload"),
-        onPressed: _getData(),
-        color: Colors.amberAccent,
-      ),
+                minWidth: 200.0,
+                height: 42.0,
+                color: Colors.tealAccent[700],
+                onPressed:(){ _fetch();},
+                child: Text(
+                  'Reload',
+                  style: TextStyle(color: Colors.white),
+                ))
     );
 
-    Widget textSection = Container(
-      padding: const EdgeInsets.all(32.0),
-      child: Text(
-        '''
-        ''',
-        softWrap: true,
-      ),
-    );
+    
 
     return new MaterialApp(
       title: "Snow's APOD",
@@ -106,19 +83,52 @@ class MyApp extends State<MyAppState> {
         appBar: AppBar(
           title: Text('Apod'),
         ),
-        body: ListView(
-          children: [
-            Image.asset(
-              'images/lake.jpg',
+        body:Container(
+          child: StreamBuilder(
+            stream: _refreshController.stream,
+            builder: (BuildContext context,AsyncSnapshot snapshot){
+            if (snapshot.hasError) {
+            return Text(snapshot.error);
+          }
+          else if (snapshot.hasData) {
+              return new ListView(
+          children: <Widget>[
+            
+                        
+           new Image.network(
+              snapshot.data.url,
               width: 600.0,
               height: 550.0,
               fit: BoxFit.cover,
             ),
-            titleSection,
-            textSection,
-            reLoad
+            new Text(
+                    snapshot.data.copyright,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  new Text(
+                  snapshot.data.explanation,
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                  ),
+                ),
+                reLoad
+                    
+                  
           ],
-        ),
+        );
+                }
+        else  if (snapshot.connectionState != ConnectionState.done) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }  
+                       
+            }
+          ),
+        )
+         
       ),
     );
   }
@@ -127,7 +137,7 @@ class MyApp extends State<MyAppState> {
 class MyAppState extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+   
 
     return MyApp();
   }
