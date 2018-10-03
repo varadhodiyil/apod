@@ -39,13 +39,15 @@ class MyApp extends State<MyAppState> {
   static APODResponse nasaResponse = new APODResponse();
 
   Future<String> _getMessage(String url) async {
-    String value;
+    String value ;
     try {
-      File file = await SaveFile().saveImage(url);
-      var sendMap = <String, dynamic>{'path': file.path};
+      String filePath = await SaveFile().saveImage(url);
+      
+      var sendMap = <String, dynamic>{'path': filePath};
       value = await platform.invokeMethod('getMessage', sendMap);
     } on Error catch (e) {
-      throw 'Error has occured while saving';
+
+      print(e.stackTrace);
     }
 
     return value;
@@ -54,7 +56,7 @@ class MyApp extends State<MyAppState> {
   Future<Null> _getData() async {
     nasaResponse = await fetchPost();
     _refreshController.add(nasaResponse);
-    _getMessage(nasaResponse.url).then((String message) {
+    _getMessage(nasaResponse.hdurl).then((String message) {
       setState(() {
         _message = message;
       });

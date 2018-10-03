@@ -4,6 +4,7 @@ import android.app.WallpaperManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import java.io.File;
@@ -37,20 +38,32 @@ public class MainActivity extends FlutterActivity {
         {
           String path = (String) arguments.get("path");
           String message = "Its working and the path is -- "+ path;
+
+          if(!path.equals("exists"))
+          {
+            setWallpaper(path);
+            message = "wallpaper changed";
+          }
           result.success(message);
-          setWallpaper(path);
+
         }
       }
 
       private void setWallpaper (String path)
       {
         File imgFile = new  File(path);
-        Log.e(TAG, "shareFilepathhhhhhhhhhhhh: "+imgFile);
+        Log.e(TAG, "shareFilepathhhhhhhhhhhhh: "+imgFile.getAbsolutePath());
         // set bitmap to wallpaper
         Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
         WallpaperManager wm = WallpaperManager.getInstance(getApplication().getApplicationContext());
         try{
-          wm.setBitmap(bitmap);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels << 1;
+//                    myBitmap = Bitmap.createScaledBitmap(myBitmap,width, height, true);
+        wm.setBitmap(bitmap);
+        wm.suggestDesiredDimensions(width,height);
         }catch (IOException e){
           Log.e(TAG, "shareFile: cannot set image as wallpaper",e );
         }

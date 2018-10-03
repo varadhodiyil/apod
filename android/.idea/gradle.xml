@@ -7,6 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
+            <option value="$USER_HOME$/Downloads/Softwares/flutter_linux_v0.5.1-beta/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-0.4.1/android" />
+            <option value="$USER_HOME$/Downloads/Softwares/flutter_linux_v0.5.1-beta/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences-0.4.2/android" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
           </set>
